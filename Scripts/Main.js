@@ -28,14 +28,14 @@ client.on('message', async msg => {
         console.log('Mensagem Particular');
         
         if (msg.from == '5518997072992@c.us') {
-            console.log('é dentro')
+            console.log('Coffee Break...')
             const chat = await msg.getChat();
             const contact = await msg.getContact();
             const name = contact.pushname;
 
             switch (msg.body) {
                 case '//list':
-                    await client.sendMessage(dict)
+                    await client.sendMessage(dict);
                     break;
                 case '//clear':
                     dict = new Map();
@@ -70,6 +70,7 @@ client.on('message', async msg => {
                         await delay(3000);
                         await chat.sendStateTyping(); 
                         dict.set(msg.from, 1);
+                        break;
                     }
 
                     if (msg.body !== null && msg.body === '2' && msg.from.endsWith('@c.us')) {
@@ -85,6 +86,7 @@ client.on('message', async msg => {
                         await chat.sendStateTyping();
                         await delay(3000);
                         await client.sendMessage(msg.from, 'Obrigado');
+                        break;
                     }
 
                     if (msg.body !== null && msg.body === '3' && msg.from.endsWith('@c.us')) {
@@ -101,6 +103,7 @@ client.on('message', async msg => {
                         await client.sendMessage(msg.from, 'Obrigado');
                         await delay(3000); 
                         await chat.sendStateTyping();
+                        break;
                     }
                     if (msg.body !== null && msg.body === '4' && msg.from.endsWith('@c.us')) {
                         const chat = await msg.getChat();
@@ -110,6 +113,7 @@ client.on('message', async msg => {
                         await client.sendMessage(msg.from, 'Informe o motivo do contato, que em breve um dos nossos técnicos vai te atender.');
                         await delay(3000); 
                         await chat.sendStateTyping();
+                        break;
                     }
                     else {
                         const chat = await msg.getChat();
@@ -118,8 +122,8 @@ client.on('message', async msg => {
                         await delay(3000);
                         await client.sendMessage(msg.from, 'Não entendi, por favor, responda com 1, 2, 3 ou 4. Para que eu possa lhe auxiliar.');
                         await delay(3000); 
+                        break;
                     }
-                    break;
                 
                 case 1:
                     const chat = await msg.getChat();
@@ -128,8 +132,11 @@ client.on('message', async msg => {
                     await delay(3000);
                     await client.sendMessage(msg.from, 'E qual o problema do equipamento?.');
                     await delay(3000); 
+                    dict.set(msg.from, 2);
                     break;
-
+                
+                case 2:
+                    break;
                 default:
 
                     console.log('Erro!');
@@ -140,7 +147,7 @@ client.on('message', async msg => {
 
         if(dict.has(msg.from) == false){
             console.log('Mensagem inicial')
-            await delay(3000);
+            await delay(1000);
             await chat.sendStateTyping();
             await delay(3000);
             const contact = await msg.getContact();
@@ -148,7 +155,6 @@ client.on('message', async msg => {
             await client.sendMessage(msg.from,'Olá! ' + name.split(" ")[0] + '\nSou o assistente da Digymaq, estou aqui para lhe auxiliar.\n\nAntes de prosseguirmos, eu preciso saber. Sua impressora é:\n\n1 - Alugada com a Digymaq \n2 - Particular \n3 - Toner ou Suprimentos\n4 - Outro Motivo');
             await delay(3000);
             await chat.sendStateTyping(); 
-            await delay(5000); 
             dict.set(msg.from, 0);
         }    
     } else {
