@@ -45,8 +45,8 @@ client.on('message', async msg => {
                     default:
                         if (msg.body.endsWith('@c.us')) {
                             console.log('Deletando contato do... ' + msg.body);
-                            if(dict.has(msg.from)){
-                                dict.delete(msg.from);
+                            if(dict.has(msg.body)){
+                                dict.delete(msg.body);
                             }else{
                                 console.log('Não existe o contato '+ msg.body);
                             }
