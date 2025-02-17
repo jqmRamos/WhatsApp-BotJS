@@ -53,85 +53,60 @@ client.on('message', async msg => {
                         }
                         break;
                 }
-            }
-            if(dict.has(msg.from)){
+            }else if(dict.has(msg.from)){
                     
                 switch (dict.get(msg.from)) {
                     case 0:
                         console.log('Valor:', dict.get(msg.from));
-                        if (msg.body !== null && msg.body === '1' && msg.from.endsWith('@c.us')) {
-                            const chat = await msg.getChat();
-                            await delay(3000); // Delay de 3 segundos
-                            await chat.sendStateTyping(); // Simulando Digitação
-                            await delay(3000);
-                            await client.sendMessage(msg.from, 'Certo');
-                            await delay(2000); 
-                            await chat.sendStateTyping(); 
-                            await delay(3000);
-                            await client.sendMessage(msg.from, 'Na sua impressora tem um adesivo da Digymaq que vai estar com o Número de Série e o Patrimônio. Poderia me informar quais são?');
-                            await delay(3000);
-                            await chat.sendStateTyping(); 
-                            dict.set(msg.from, 1);
-                            break;
-                        }
-
-                        if (msg.body !== null && msg.body === '2' && msg.from.endsWith('@c.us')) {
-                            const chat = await msg.getChat();
-                            await delay(3000); 
-                            await chat.sendStateTyping();
-                            await delay(3000);
-                            await client.sendMessage(msg.from, 'Assuntos sobre impressoras particulares devem ser tratados com este contato:');
-                            await delay(3000); 
-                            await chat.sendStateTyping();
-                            await delay(3000);
-                            await client.sendMessage(msg.from, '+55 18 93085-7355');
-                            await chat.sendStateTyping();
-                            await delay(3000);
-                            await client.sendMessage(msg.from, 'Obrigado');
-                            break;
-                        }
-
-                        if (msg.body !== null && msg.body === '3' && msg.from.endsWith('@c.us')) {
-                            const chat = await msg.getChat();
-                            await delay(3000); 
-                            await chat.sendStateTyping();
-                            await delay(3000);
-                            await client.sendMessage(msg.from, 'Assuntos sobre impressoras particulares devem ser tratados com este contato:');
-                            await chat.sendStateTyping();
-                            await delay(3000);
-                            await client.sendMessage(msg.from, '+55 800 366 1212');
-                            await chat.sendStateTyping();
-                            await delay(3000);
-                            await client.sendMessage(msg.from, 'Obrigado');
-                            await delay(3000); 
-                            await chat.sendStateTyping();
-                            break;
-                        }
-                        if (msg.body !== null && msg.body === '4' && msg.from.endsWith('@c.us')) {
-                            const chat = await msg.getChat();
-                            await delay(3000); 
-                            await chat.sendStateTyping();
-                            await delay(3000);
-                            await client.sendMessage(msg.from, 'Informe o motivo do contato, que em breve um dos nossos técnicos vai te atender.');
-                            await delay(3000); 
-                            await chat.sendStateTyping();
-                            break;
-                        }
-                        else {
-                            const chat = await msg.getChat();
-                            await delay(3000); 
-                            await chat.sendStateTyping();
-                            await delay(3000);
-                            await client.sendMessage(msg.from, 'Não entendi, por favor, responda com 1, 2, 3 ou 4. Para que eu possa lhe auxiliar.');
-                            await delay(3000); 
-                            break;
-                        }
-                    
-                    case 1:
+                        
                         const chat = await msg.getChat();
-                        await delay(3000); 
-                        await chat.sendStateTyping();
-                        await delay(3000);
+                        switch (msg.body) {
+                            case '1':
+                                fakeTyping();
+                                await client.sendMessage(msg.from, 'Certo');
+                                fakeTyping();
+                                await client.sendMessage(msg.from, 'Na sua impressora tem um adesivo da Digymaq que vai estar com o Número de Série e o Patrimônio. Poderia me informar quais são?');
+                                fakeTyping();
+                                dict.set(msg.from, 1);
+                                break;
+
+                            case '2':
+                                fakeTyping();
+                                await client.sendMessage(msg.from, 'Assuntos sobre impressoras particulares devem ser tratados com este contato:');
+                                fakeTyping();
+                                await client.sendMessage(msg.from, '+55 18 93085-7355');
+                                fakeTyping();
+                                await client.sendMessage(msg.from, 'Obrigado');
+                                dict.set(msg.from, 2);
+                                break;
+
+                            case '3':
+                                fakeTyping();
+                                await client.sendMessage(msg.from, 'Assuntos sobre impressoras particulares devem ser tratados com este contato:');
+                                fakeTyping();
+                                await client.sendMessage(msg.from, '+55 800 366 1212');
+                                fakeTyping();
+                                await client.sendMessage(msg.from, 'Obrigado');
+                                fakeTyping();
+                                dict.set(msg.from, 2);
+                                break;
+                            case '4':
+                                    fakeTyping();
+                                    await client.sendMessage(msg.from, 'Informe o motivo do contato, que em breve um dos nossos técnicos vai te atender.');
+                                    fakeTyping();
+                                    dict.set(msg.from, 2);
+                                    break;
+                        
+                            default:
+                                const chat = await msg.getChat();
+                                fakeTyping();
+                                await client.sendMessage(msg.from, 'Não entendi, por favor, responda com 1, 2, 3 ou 4. Para que eu possa lhe auxiliar.');
+                                await delay(3000); 
+                                break;
+                        }
+                        break;
+                    case 1:
+                        
                         await client.sendMessage(msg.from, 'E qual o problema do equipamento?.');
                         await delay(3000); 
                         dict.set(msg.from, 2);
@@ -139,32 +114,27 @@ client.on('message', async msg => {
                     
                     case 2:
                         break;
-                    default:
 
+                    default:
                         console.log('Erro!');
                         break;
 
                 }
-            }
-
-            if(dict.has(msg.from) == false){
+            }else{
                 console.log('Mensagem inicial')
-                await delay(1000);
-                await chat.sendStateTyping();
-                await delay(3000);
+                fakeTyping();
                 const contact = await msg.getContact();
                 const name = contact.pushname;
                 await client.sendMessage(msg.from,'Olá! ' + name.split(" ")[0] + '\nSou o assistente da Digymaq, estou aqui para lhe auxiliar.\n\nAntes de prosseguirmos, eu preciso saber. Sua impressora é:\n\n1 - Alugada com a Digymaq \n2 - Particular \n3 - Toner ou Suprimentos\n4 - Outro Motivo');
-                await delay(3000);
-                await chat.sendStateTyping(); 
+                fakeTyping(); 
                 dict.set(msg.from, 0);
-            }else{
-                console.log('Não está no horario e data')
-                
-                const contact = await msg.getContact();
-                const name = contact.pushname;
-                await client.sendMessage('Olá! ' + name.split(" ")[0] + '\nNo momento não estamos trabalhando. Nosso horário é de segunda a sexta-feira, das 8h às 18h. Por favor, entre em contato novamente durante nosso horário comercial ou aguarde que em breve nosso Suporte Técnico vai entrar em contato.');
             }
+        }else{
+            console.log('Não está no horario e data')
+            
+            const contact = await msg.getContact();
+            const name = contact.pushname;
+            await client.sendMessage('Olá! ' + name.split(" ")[0] + '\nNo momento não estamos trabalhando. Nosso horário é de segunda a sexta-feira, das 8h às 18h. Por favor, entre em contato novamente durante nosso horário comercial ou aguarde que em breve nosso Suporte Técnico vai entrar em contato.');
         }
     } else {
         console.log('Mensagem de Grupo')
@@ -178,6 +148,12 @@ client.on('message', async msg => {
 
 
 });
+
+async function fakeTyping() {
+    await delay(3000); 
+    await chat.sendStateTyping();
+    await delay(3000);
+}
 
 function isBusinessHours(){
     const now = new Date();
