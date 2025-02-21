@@ -1,32 +1,31 @@
 var dict = new Map();
-// leitor de qr code
 const qrcode = require('qrcode-terminal');
-const { Client, Buttons, List, MessageMedia } = require('whatsapp-web.js'); // Mudança Buttons
+const { Client, Buttons, List, MessageMedia } = require('whatsapp-web.js'); //Buttons isn't working
 const client = new Client();
 require('dotenv').config();
-// serviço de leitura do qr code
+
 client.on('qr', qr => {
     qrcode.generate(qr, {small: true});
 });
-// apos isso ele diz que foi tudo certo
+
 client.on('ready', () => {
-    console.log('Tudo certo! WhatsApp conectado.');
+    console.log('WhatsApp connected.');
 });
-// E inicializa tudo 
+ 
 client.initialize();
 
-const delay = ms => new Promise(res => setTimeout(res, ms)); // Função que usamos para criar o delay entre uma ação e outra
+const delay = ms => new Promise(res => setTimeout(res, ms));
 
-// Funil
-
+//When we got a message, it goes here:
 client.on('message', async msg => {
 
-    console.log('Recebendo Mensagem...');
+    console.log('Receiving Message...');
     const chat = await msg.getChat();
+    const contact = await msg.getContact();
     console.log(msg.body);
-    console.log('Checando o status do equipamento...')
+    console.log('Checking Equipament Status...')
     if (msg.from.length < 19) {
-        console.log('Mensagem Particular');
+        console.log('Private Message');
         //Se estiver dentro do horario e data
         if(isBusinessHours()){
             if (msg.from == process.env.COFFEEBREAK_PHONE) {
@@ -54,52 +53,52 @@ client.on('message', async msg => {
                         break;
                 }
             }else if(dict.has(msg.from)){
-                    
+            
+                const chat = await msg.getChat();
                 switch (dict.get(msg.from)) {
                     case 0:
                         console.log('Valor:', dict.get(msg.from));
                         
-                        const chat = await msg.getChat();
                         switch (msg.body) {
                             case '1':
-                                fakeTyping();
+                                fakeTyping(chat);
                                 await client.sendMessage(msg.from, 'Certo');
-                                fakeTyping();
+                                fakeTyping(chat);
                                 await client.sendMessage(msg.from, 'Na sua impressora tem um adesivo da Digymaq que vai estar com o Número de Série e o Patrimônio. Poderia me informar quais são?');
-                                fakeTyping();
+                                fakeTyping(chat);
                                 dict.set(msg.from, 1);
                                 break;
 
                             case '2':
                                 fakeTyping();
                                 await client.sendMessage(msg.from, 'Assuntos sobre impressoras particulares devem ser tratados com este contato:');
-                                fakeTyping();
+                                fakeTyping(chat);
                                 await client.sendMessage(msg.from, '+55 18 93085-7355');
-                                fakeTyping();
+                                fakeTyping(chat);
                                 await client.sendMessage(msg.from, 'Obrigado');
                                 dict.set(msg.from, 2);
                                 break;
 
                             case '3':
-                                fakeTyping();
+                                fakeTyping(chat);
                                 await client.sendMessage(msg.from, 'Assuntos sobre impressoras particulares devem ser tratados com este contato:');
-                                fakeTyping();
+                                fakeTyping(chat);
                                 await client.sendMessage(msg.from, '+55 800 366 1212');
-                                fakeTyping();
+                                fakeTyping(chat);
                                 await client.sendMessage(msg.from, 'Obrigado');
-                                fakeTyping();
+                                fakeTyping(chat);
                                 dict.set(msg.from, 2);
                                 break;
                             case '4':
-                                    fakeTyping();
+                                    fakeTyping(chat);
                                     await client.sendMessage(msg.from, 'Informe o motivo do contato, que em breve um dos nossos técnicos vai te atender.');
-                                    fakeTyping();
+                                    fakeTyping(chat);
                                     dict.set(msg.from, 2);
                                     break;
                         
                             default:
                                 const chat = await msg.getChat();
-                                fakeTyping();
+                                fakeTyping(chat);
                                 await client.sendMessage(msg.from, 'Não entendi, por favor, responda com 1, 2, 3 ou 4. Para que eu possa lhe auxiliar.');
                                 await delay(3000); 
                                 break;
@@ -121,35 +120,28 @@ client.on('message', async msg => {
 
                 }
             }else{
-                console.log('Mensagem inicial')
-                fakeTyping();
-                const contact = await msg.getContact();
+                console.log('Initial Message');
+                fakeTyping(chat);
                 const name = contact.pushname;
-                await client.sendMessage(msg.from,'Olá! ' + name.split(" ")[0] + '\nSou o assistente da Digymaq, estou aqui para lhe auxiliar.\n\nAntes de prosseguirmos, eu preciso saber. Sua impressora é:\n\n1 - Alugada com a Digymaq \n2 - Particular \n3 - Toner ou Suprimentos\n4 - Outro Motivo');
-                fakeTyping(); 
+                await client.sendMessage(msg.from,'Olá! ' + name.split(" ")[0] + '\nSou o assistente da Digymaq, estou aqui para lhe auxiliar.');
+                fakeTyping(chat); 
+                await client.sendMessage(msg.from, 'Antes de prosseguirmos, eu preciso saber.');
+                fakeTyping(chat);
+                await client.sendMessage(msg.from, ' Sua impressora é:\n\n1 - Alugada com a Digymaq \n2 - Particular \n3 - Toner ou Suprimentos\n4 - Não estou com problemas na minha impressora');
                 dict.set(msg.from, 0);
             }
         }else{
-            console.log('Não está no horario e data')
-            
-            const contact = await msg.getContact();
+            console.log('This is not business time')
+            fakeTyping(chat);
             const name = contact.pushname;
             await client.sendMessage('Olá! ' + name.split(" ")[0] + '\nNo momento não estamos trabalhando. Nosso horário é de segunda a sexta-feira, das 8h às 18h. Por favor, entre em contato novamente durante nosso horário comercial ou aguarde que em breve nosso Suporte Técnico vai entrar em contato.');
         }
     } else {
-        console.log('Mensagem de Grupo')
+        console.log('Group Message');
     }
-
-
-
-
-
-
-
-
 });
 
-async function fakeTyping() {
+async function fakeTyping(chat) {
     await delay(3000); 
     await chat.sendStateTyping();
     await delay(3000);
