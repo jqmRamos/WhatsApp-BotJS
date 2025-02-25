@@ -24,23 +24,24 @@ client.on('message', async msg => {
     const contact = await msg.getContact();
     console.log(msg.body);
     console.log('Checking Equipament Status...')
-    if (msg.from.length < 19) {
+    if (!msg.isGroup) {
         console.log('Private Message');
         //Se estiver dentro do horario e data
         if(isBusinessHours()){
             if (msg.from == process.env.COFFEEBREAK_PHONE) {
                 console.log('Coffee Break...')
-                const chat = await msg.getChat();
-                const contact = await msg.getContact();
                 const name = contact.pushname;
 
                 switch (msg.body) {
                     case '//list':
-                        await client.sendMessage(dict);
+                        let listMessage = [...dict.entries()].map(([key, value]) => `${key}: ${value}`).join("\n");
+                        await client.sendMessage(msg.from, listMessage || "The list is empty.");
                         break;
+                        
                     case '//clear':
                         dict = new Map();
                         break;
+
                     default:
                         if (msg.body.endsWith('@c.us')) {
                             console.log('Deletando contato do... ' + msg.body);
@@ -53,8 +54,6 @@ client.on('message', async msg => {
                         break;
                 }
             }else if(dict.has(msg.from)){
-            
-                const chat = await msg.getChat();
                 switch (dict.get(msg.from)) {
                     case 0:
                         console.log('Valor:', dict.get(msg.from));
@@ -70,7 +69,7 @@ client.on('message', async msg => {
                                 break;
 
                             case '2':
-                                fakeTyping();
+                                fakeTyping(chat);
                                 await client.sendMessage(msg.from, 'Assuntos sobre impressoras particulares devem ser tratados com este contato:');
                                 fakeTyping(chat);
                                 await client.sendMessage(msg.from, '+55 18 93085-7355');
@@ -89,6 +88,7 @@ client.on('message', async msg => {
                                 fakeTyping(chat);
                                 dict.set(msg.from, 2);
                                 break;
+
                             case '4':
                                     fakeTyping(chat);
                                     await client.sendMessage(msg.from, 'Informe o motivo do contato, que em breve um dos nossos técnicos vai te atender.');
@@ -97,7 +97,6 @@ client.on('message', async msg => {
                                     break;
                         
                             default:
-                                const chat = await msg.getChat();
                                 fakeTyping(chat);
                                 await client.sendMessage(msg.from, 'Não entendi, por favor, responda com 1, 2, 3 ou 4. Para que eu possa lhe auxiliar.');
                                 await delay(3000); 
@@ -112,6 +111,7 @@ client.on('message', async msg => {
                         break;
                     
                     case 2:
+                        console.log('the client is on case 2');
                         break;
 
                     default:
@@ -134,7 +134,7 @@ client.on('message', async msg => {
             console.log('This is not business time')
             fakeTyping(chat);
             const name = contact.pushname;
-            await client.sendMessage('Olá! ' + name.split(" ")[0] + '\nNo momento não estamos trabalhando. Nosso horário é de segunda a sexta-feira, das 8h às 18h. Por favor, entre em contato novamente durante nosso horário comercial ou aguarde que em breve nosso Suporte Técnico vai entrar em contato.');
+            await client.sendMessage(msg.from, 'Olá! ' + name.split(" ")[0] + '\nNo momento não estamos trabalhando. Nosso horário é de segunda a sexta-feira, das 8h às 18h. Por favor, entre em contato novamente durante nosso horário comercial ou aguarde que em breve nosso Suporte Técnico vai entrar em contato.');
         }
     } else {
         console.log('Group Message');
@@ -142,7 +142,6 @@ client.on('message', async msg => {
 });
 
 async function fakeTyping(chat) {
-    await delay(3000); 
     await chat.sendStateTyping();
     await delay(3000);
 }
